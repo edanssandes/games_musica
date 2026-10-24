@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "g05", group: "Sol maior · 1 sustenido", key: "G", title: "5", name: "Contorno irregular", bpm: 102, notes: [74, 67, 71, 64, 78, 69, 76, 67, 79, 71, 74, 62, 72, 66, 69, 59] });

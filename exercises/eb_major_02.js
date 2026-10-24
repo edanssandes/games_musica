@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "eb02", group: "Mi bemol maior · 3 bemóis", key: "Eb", title: "2", name: "Saltos e inversões", bpm: 94, notes: [51, 58, 63, 68, 72, 65, 75, 70, 67, 60, 68, 74, 70, 63, 58, 55] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "d05", group: "Ré maior · 2 sustenidos", key: "D", title: "5", name: "Contorno amplo", bpm: 104, notes: [74, 66, 78, 69, 76, 62, 73, 66, 79, 71, 76, 64, 74, 69, 62, 57] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "eb01", group: "Mi bemol maior · 3 bemóis", key: "Eb", title: "1", name: "Arpejos em mi bemol", bpm: 88, notes: [63, 67, 70, 75, 79, 75, 72, 70, 67, 63, 65, 70, 74, 77, 70, 63] });

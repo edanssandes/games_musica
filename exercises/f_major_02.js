@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "f02", group: "Fá maior · 1 bemol", key: "F", title: "2", name: "Saltos e inversões", bpm: 94, notes: [53, 60, 65, 70, 74, 69, 77, 72, 67, 62, 70, 76, 72, 65, 60, 57] });

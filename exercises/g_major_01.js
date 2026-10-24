@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "g01", group: "Sol maior · 1 sustenido", key: "G", title: "1", name: "Escala com saltos", bpm: 88, notes: [67, 71, 74, 78, 76, 74, 71, 67, 69, 72, 76, 79, 78, 74, 71, 67] });

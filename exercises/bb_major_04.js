@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "bb04", group: "Si bemol maior · 2 bemóis", key: "Bb", title: "4", name: "Notas longas e mudança de registro", bpm: 98, notes: [{ midi: 70, duration: 2 }, 74, 77, 82, { midi: 84, duration: 2 }, 82, 79, 75, { midi: 77, duration: 2 }, 81, 84, 79, { midi: 75, duration: 2 }, 70] });

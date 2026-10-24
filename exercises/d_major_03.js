@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "d03", group: "Ré maior · 2 sustenidos", key: "D", title: "3", name: "Linha com dó sustenido e colcheias", bpm: 86, notes: [66, 69, { midi: 73, duration: 0.5 }, { midi: 76, duration: 0.5 }, { midi: 78, duration: 0.5 }, { midi: 76, duration: 0.5 }, 74, 71, 69, 66, 62, 64, 66, 73, 78, 76, 71, 62] });

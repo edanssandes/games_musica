@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "bb05", group: "Si bemol maior · 2 bemóis", key: "Bb", title: "5", name: "Contorno amplo", bpm: 104, notes: [82, 74, 79, 70, 84, 75, 81, 72, 86, 77, 82, 67, 79, 74, 70, 58] });

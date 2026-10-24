@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "f04", group: "Fá maior · 1 bemol", key: "F", title: "4", name: "Sustentação e alcance", bpm: 98, notes: [{ midi: 65, duration: 2 }, 69, 72, 77, { midi: 79, duration: 2 }, 77, 74, 70, { midi: 72, duration: 2 }, 76, 79, 74, { midi: 70, duration: 2 }, 65] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "bb03", group: "Si bemol maior · 2 bemóis", key: "Bb", title: "3", name: "Si bemol, mi bemol e colcheias", bpm: 86, notes: [74, 77, { midi: 82, duration: 0.5 }, { midi: 84, duration: 0.5 }, { midi: 86, duration: 0.5 }, { midi: 84, duration: 0.5 }, 84, 82, 79, 75, 77, 74, 70, 72, 75, 81, 74, 70] });

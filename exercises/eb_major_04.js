@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "eb04", group: "Mi bemol maior · 3 bemóis", key: "Eb", title: "4", name: "Sustentação e alcance", bpm: 98, notes: [{ midi: 63, duration: 2 }, 67, 70, 75, { midi: 79, duration: 2 }, 77, 74, 70, { midi: 72, duration: 2 }, 75, 79, 74, { midi: 70, duration: 2 }, 63] });

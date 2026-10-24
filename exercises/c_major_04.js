@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "c04", group: "Dó maior · sem alterações", key: "C", title: "4", name: "Frases com notas longas", bpm: 96, notes: [{ midi: 60, duration: 2 }, 64, 67, { midi: 72, duration: 2 }, 71, 69, 67, { midi: 65, duration: 2 }, 69, 72, 74, { midi: 67, duration: 2 }, 64, 60] });

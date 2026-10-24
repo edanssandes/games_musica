@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "bb02", group: "Si bemol maior · 2 bemóis", key: "Bb", title: "2", name: "Saltos entre acordes", bpm: 94, notes: [58, 65, 70, 75, 79, 72, 82, 77, 74, 67, 75, 81, 77, 70, 65, 62] });

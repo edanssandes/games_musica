@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "g02", group: "Sol maior · 1 sustenido", key: "G", title: "2", name: "Saltos interválicos", bpm: 94, notes: [55, 62, 67, 71, 74, 69, 78, 74, 71, 64, 69, 76, 72, 67, 62, 59] });

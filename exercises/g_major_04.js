@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "g04", group: "Sol maior · 1 sustenido", key: "G", title: "4", name: "Sustentação e mudança de registro", bpm: 98, notes: [{ midi: 67, duration: 2 }, 71, 74, 78, { midi: 79, duration: 2 }, 76, 74, 71, { midi: 69, duration: 2 }, 72, 76, 74, { midi: 67, duration: 2 }, 62] });

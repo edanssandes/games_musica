@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "g03", group: "Sol maior · 1 sustenido", key: "G", title: "3", name: "Frase ascendente com colcheias", bpm: 82, notes: [59, 62, { midi: 66, duration: 0.5 }, { midi: 67, duration: 0.5 }, { midi: 71, duration: 0.5 }, { midi: 74, duration: 0.5 }, 71, 74, 78, 79, 76, 74, 71, 69, 67, 64, 62, 55] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "eb05", group: "Mi bemol maior · 3 bemóis", key: "Eb", title: "5", name: "Linha quebrada", bpm: 104, notes: [79, 70, 75, 67, 82, 72, 77, 68, 84, 74, 79, 65, 75, 70, 63, 51] });

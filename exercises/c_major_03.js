@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "c03", group: "Dó maior · sem alterações", key: "C", title: "3", name: "Registro ampliado e colcheias", bpm: 84, notes: [55, 60, { midi: 64, duration: 0.5 }, { midi: 67, duration: 0.5 }, { midi: 69, duration: 0.5 }, { midi: 72, duration: 0.5 }, 72, 76, 72, 69, 64, 59, 62, 67, 71, 74, 67, 60] });

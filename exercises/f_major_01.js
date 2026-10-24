@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "f01", group: "Fá maior · 1 bemol", key: "F", title: "1", name: "Arpejos com si bemol", bpm: 88, notes: [65, 69, 72, 77, 74, 72, 70, 65, 67, 70, 74, 79, 77, 74, 69, 65] });

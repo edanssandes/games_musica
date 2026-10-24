@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "f05", group: "Fá maior · 1 bemol", key: "F", title: "5", name: "Frase quebrada", bpm: 104, notes: [77, 70, 74, 65, 79, 72, 76, 67, 82, 74, 77, 69, 72, 65, 70, 60] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "c05", group: "Dó maior · sem alterações", key: "C", title: "5", name: "Linha quebrada", bpm: 100, notes: [72, 67, 74, 69, 76, 71, 67, 72, 65, 69, 62, 67, 60, 64, 59, 55] });

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "d01", group: "Ré maior · 2 sustenidos", key: "D", title: "1", name: "Arpejos em ré", bpm: 88, notes: [62, 66, 69, 74, 78, 74, 71, 69, 66, 62, 64, 69, 73, 76, 69, 62] });

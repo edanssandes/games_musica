@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "d02", group: "Ré maior · 2 sustenidos", key: "D", title: "2", name: "Saltos no registro médio", bpm: 94, notes: [57, 62, 66, 71, 76, 69, 74, 78, 73, 66, 71, 79, 74, 69, 64, 62] });

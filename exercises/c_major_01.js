@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "c01", group: "Dó maior · sem alterações", key: "C", title: "1", name: "Arpejos e direção", bpm: 88, notes: [60, 64, 67, 72, 69, 67, 64, 60, 62, 65, 69, 74, 71, 69, 65, 62] });

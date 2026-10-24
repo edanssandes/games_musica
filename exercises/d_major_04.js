@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "d04", group: "Ré maior · 2 sustenidos", key: "D", title: "4", name: "Notas longas e saltos", bpm: 98, notes: [{ midi: 62, duration: 2 }, 66, 69, 74, { midi: 78, duration: 2 }, 76, 73, 69, { midi: 71, duration: 2 }, 74, 78, 76, { midi: 69, duration: 2 }, 62] });

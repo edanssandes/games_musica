@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leitura a Primeira Vista</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js" defer></script>
+    <script src="exercises/manifest.js" defer></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Prática de leitura rítmica e melódica</p>
+          <h1>Leitura a Primeira Vista</h1>
+        </div>
+        <div class="status-pill" id="statusPill">Pronto</div>
+      </header>
+
+      <main class="game-panel">
+        <section class="controls-card">
+          <div class="controls-row">
+            <label class="select-wrap">
+              <span>Grupo de exercícios</span>
+              <select id="groupSelect" aria-label="Selecionar grupo de exercícios"></select>
+            </label>
+            <label class="select-wrap">
+              <span>Exercício</span>
+              <select id="exerciseSelect" aria-label="Selecionar exercício"></select>
+            </label>
+            <button id="repeatBtn" class="secondary-btn icon-btn" title="Repetir exercício" aria-label="Repetir exercício"><span class="button-icon" aria-hidden="true">↻</span><span>Repetir</span></button>
+            <button id="nextBtn" class="secondary-btn icon-btn" title="Próximo exercício" aria-label="Próximo exercício"><span class="button-icon" aria-hidden="true">⏭︎</span><span>Próximo</span></button>
+            <button id="settingsBtn" class="secondary-btn icon-btn" title="Configurações" aria-label="Configurações"><span class="button-icon" aria-hidden="true">⚙︎</span><span>Configurações</span></button>
+          </div>
+
+        </section>
+
+        <section class="sheet-card">
+          <div class="sheet-header">
+            <div>
+              <p class="sheet-kicker" id="exerciseTitle">Exercício 1</p>
+              <h2 id="exerciseName">Escala de início</h2>
+            </div>
+          </div>
+
+          <div id="staff" role="img" aria-label="Partitura do exercício"></div>
+          <div id="countdown" class="countdown" hidden aria-live="polite">
+            <div class="countdown-label">
+              <span>Tempo para observar</span>
+              <strong id="countdownText">10 s</strong>
+            </div>
+            <div id="progressTrack" class="progress-track" role="progressbar" aria-label="Tempo restante para observar a partitura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div id="progressFill" class="progress-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="message-card">
+          <p id="messageBox">Escolha um exercício no seletor ou toque em “Repetir” para começar.</p>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal hidden" aria-live="polite">
+      <div class="modal-card">
+        <h3>Audição concluída</h3>
+        <p id="modalText">Quer ouvir este exercício novamente ou seguir para o próximo?</p>
+        <div class="modal-actions">
+          <button id="modalRepeatBtn" class="primary-btn">Repetir</button>
+          <button id="modalNextBtn" class="secondary-btn">Próximo</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden" aria-labelledby="settingsTitle" aria-modal="true" role="dialog">
+      <form id="settingsForm" class="modal-card settings-card">
+        <h3 id="settingsTitle">Configurações</h3>
+        <p>Defina por quantos segundos a partitura ficará na tela antes de começar a música.</p>
+        <label class="setting-field" for="exposureInput">
+          <span>Tempo de observação</span>
+          <span class="number-input-wrap">
+            <input id="exposureInput" type="number" min="1" max="60" step="1" value="10" required />
+            <span>segundos</span>
+          </span>
+        </label>
+        <label class="setting-field" for="tempoModeInput">
+          <span>Andamento da música</span>
+          <select id="tempoModeInput">
+            <option value="exercise">Usar o andamento do exercício</option>
+            <option value="custom">Definir BPM personalizado</option>
+          </select>
+        </label>
+        <label class="setting-field" for="playbackBpmInput">
+          <span>Andamento personalizado</span>
+          <span class="number-input-wrap">
+            <input id="playbackBpmInput" type="number" min="40" max="180" step="1" value="90" disabled />
+            <span>BPM</span>
+          </span>
+        </label>
+        <div class="modal-actions">
+          <button id="cancelSettingsBtn" type="button" class="secondary-btn">Cancelar</button>
+          <button type="submit" class="primary-btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,1 @@
+window.registerSightReadingExercise({ id: "c02", group: "Dó maior · sem alterações", key: "C", title: "2", name: "Saltos e retorno", bpm: 92, notes: [67, 60, 64, 69, 72, 65, 69, 74, 76, 67, 71, 64, 69, 62, 65, 60] });
