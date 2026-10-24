@@ -399,12 +399,14 @@ input:focus-visible {
 
   #staff {
     padding: 12px;
+    min-height: 220px;
   }
 
   #staff svg {
-    min-width: 620px;
-    max-width: none;
-    margin: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   .message-card {
@@ -446,6 +448,7 @@ input:focus-visible {
   }
 
   #staff svg {
-    min-width: 560px;
+    width: 100%;
+    min-width: 0;
   }
 }

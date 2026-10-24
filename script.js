@@ -134,6 +134,14 @@ function populateExerciseOptions(group) {
 }
 
 function attachEvents() {
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      if (state.currentExercise) renderScore();
+    }, 150);
+  });
+
   ui.groupSelect.addEventListener("change", (event) => {
     const firstExercise = populateExerciseOptions(event.target.value);
     if (firstExercise !== undefined) setExercise(Number(firstExercise), true);
@@ -363,10 +371,12 @@ function renderScore() {
   }
 
   const abc = exerciseToAbc(exercise);
+  const compactLayout = window.matchMedia("(max-width: 680px)").matches;
+  const staffWidth = Math.max(240, ui.staff.clientWidth - 24);
   window.ABCJS.renderAbc(ui.staff, abc, {
     responsive: "resize",
-    staffwidth: 1100,
-    scale: 1.35,
+    staffwidth: compactLayout ? staffWidth : 1100,
+    scale: compactLayout ? 1.05 : 1.35,
     paddingtop: 12,
     paddingbottom: 12,
     foregroundColor: "#111"
