@@ -563,3 +563,29 @@ body.focus-mode-active {
     min-width: 600px;
   }
 }
+
+@media (pointer: coarse) and (max-height: 500px) {
+  .app-shell:fullscreen #staff svg,
+  .app-shell.focus-mode #staff svg {
+    min-width: 680px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 680px) and (orientation: portrait) {
+  .app-shell:fullscreen::after,
+  .app-shell.focus-mode::after {
+    content: "Gire o celular para a horizontal para usar a partitura em tela cheia.";
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    background: #0c1220;
+    color: var(--text);
+    text-align: center;
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-weight: 700;
+  }
+}

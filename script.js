@@ -189,7 +189,10 @@ function attachEvents() {
   ui.volumeInput.addEventListener("input", updateVolumePreview);
   ui.settingsForm.addEventListener("submit", saveSettings);
   ui.fullscreenBtn.addEventListener("click", toggleFullscreen);
-  document.addEventListener("fullscreenchange", updateFullscreenButton);
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) unlockScreenOrientation();
+    updateFullscreenButton();
+  });
 }
 
 function loadExposureSetting() {
@@ -294,6 +297,7 @@ async function toggleFullscreen() {
   if (appShell.classList.contains("focus-mode")) {
     appShell.classList.remove("focus-mode");
     document.body.classList.remove("focus-mode-active");
+    unlockScreenOrientation();
     updateFullscreenButton();
     return;
   }
@@ -304,12 +308,30 @@ async function toggleFullscreen() {
     } else {
       if (!appShell.requestFullscreen) throw new Error("Fullscreen API indisponível");
       await appShell.requestFullscreen();
+      await lockScreenOrientation();
     }
   } catch (error) {
     appShell.classList.add("focus-mode");
     document.body.classList.add("focus-mode-active");
+    await lockScreenOrientation();
   }
   updateFullscreenButton();
+}
+
+async function lockScreenOrientation() {
+  try {
+    if (screen.orientation?.lock) await screen.orientation.lock("landscape");
+  } catch (error) {
+    // Alguns navegadores só permitem o bloqueio em tela cheia ou não oferecem essa API.
+  }
+}
+
+function unlockScreenOrientation() {
+  try {
+    screen.orientation?.unlock?.();
+  } catch (error) {
+    // A orientação volta ao controle do dispositivo mesmo se o navegador não aceitar unlock.
+  }
 }
 
 function updateFullscreenButton() {
@@ -499,12 +521,13 @@ function renderScore() {
   }
 
   const abc = exerciseToAbc(exercise);
-  const compactLayout = window.matchMedia("(max-width: 680px)").matches;
+  const compactLayout = window.matchMedia("(max-width: 680px), (pointer: coarse) and (max-height: 500px)").matches;
+  const fullscreenLayout = Boolean(document.fullscreenElement) || document.querySelector(".app-shell").classList.contains("focus-mode");
   const staffWidth = Math.max(240, ui.staff.clientWidth - 24);
   window.ABCJS.renderAbc(ui.staff, abc, {
     responsive: "resize",
     staffwidth: compactLayout ? Math.max(620, staffWidth) : 1100,
-    scale: compactLayout ? 1.4 : 1.35,
+    scale: compactLayout ? (fullscreenLayout ? 1.95 : 1.75) : 1.35,
     paddingtop: 12,
     paddingbottom: 12,
     foregroundColor: "#111",

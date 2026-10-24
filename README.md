@@ -44,10 +44,14 @@ window.registerSightReadingExercise({
 - Para personalizar ritmo, use objetos com `midi`, `duration` e opcionalmente `start`, medidos em tempos de semínima. Exemplo: `notes: [{ midi: 69, duration: 2 }, { midi: 73, duration: 0.5 }, { midi: 76, duration: 0.5 }]`.
 - Para escolher a pauta/mão, acrescente `hand: "left"` ou `hand: "right"`. Para tocar as duas mãos juntas, coloque eventos das duas mãos com o mesmo `start`; para alternar por compasso, atribua os eventos de cada compasso a uma mão.
 
+## Exercícios de leitura à primeira vista
+
+O grupo “Leitura à primeira vista · iniciante” contém 12 exercícios autorais com progressão de leitura: movimento por graus conjuntos, notas repetidas e saltos, pausas e colcheias, clave de fá, armaduras de sol/fá/si bemol maior e leitura simples nas duas pautas. Eles foram compostos para este jogo e não são transcrições de Hannah Smith ou de outro método publicado.
+
 ## Observações
 
 - O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. O timbre é uma aproximação de piano por harmônicos e envelope percussivo, não uma gravação sampleada de grand piano.
-- Há 45 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas, cinco de mãos simultâneas e cinco padrões clássicos de cinco dedos.
+- Há 57 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas, cinco de mãos simultâneas, cinco padrões clássicos de cinco dedos e 12 exercícios autorais de leitura à primeira vista.
 - O grupo “Clássicos · padrão de Hanon nº 1” traz uma adaptação curta do padrão de abertura associado ao primeiro exercício de *Le Pianiste Virtuose*, transposta para dó, sol, fá, ré e si bemol maior. As transposições e a organização para o jogo são adaptações pedagógicas, não uma reprodução integral da edição.
 - ABCJS renderiza as partituras em pauta dupla, com clave de sol e de fá, armadura, barras de compasso e durações musicais. Notas abaixo do dó central vão para a clave de fá.
 - A página não precisa de servidor, mas precisa de conexão com a internet para carregar ABCJS pelo CDN jsDelivr.

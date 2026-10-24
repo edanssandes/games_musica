@@ -8,5 +8,8 @@ window.SIGHT_READING_EXERCISE_FILES = [
   "exercises/eb_major_01.js", "exercises/eb_major_02.js", "exercises/eb_major_03.js", "exercises/eb_major_04.js", "exercises/eb_major_05.js",
   "exercises/hands_alternating_01.js", "exercises/hands_alternating_02.js", "exercises/hands_alternating_03.js", "exercises/hands_alternating_04.js", "exercises/hands_alternating_05.js",
   "exercises/hands_together_01.js", "exercises/hands_together_02.js", "exercises/hands_together_03.js", "exercises/hands_together_04.js", "exercises/hands_together_05.js",
-  "exercises/hanon_01_c.js", "exercises/hanon_01_g.js", "exercises/hanon_01_f.js", "exercises/hanon_01_d.js", "exercises/hanon_01_bb.js"
+  "exercises/hanon_01_c.js", "exercises/hanon_01_g.js", "exercises/hanon_01_f.js", "exercises/hanon_01_d.js", "exercises/hanon_01_bb.js",
+  "exercises/sight_reading_01.js", "exercises/sight_reading_02.js", "exercises/sight_reading_03.js", "exercises/sight_reading_04.js",
+  "exercises/sight_reading_05.js", "exercises/sight_reading_06.js", "exercises/sight_reading_07.js", "exercises/sight_reading_08.js",
+  "exercises/sight_reading_09.js", "exercises/sight_reading_10.js", "exercises/sight_reading_11.js", "exercises/sight_reading_12.js"
 ];
