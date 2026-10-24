@@ -54,6 +54,7 @@ const state = {
   playbackTotalBeats: 0,
   playbackBeatDuration: 0,
   scoreNotePositions: new Map(),
+  firstScoreBeat: 0,
   isPlayingDemo: false,
   exposureTimerId: null,
   exposureFrameId: null,
@@ -534,7 +535,7 @@ function renderScore() {
     clickListener: (abcElement) => {
       const startChar = abcElement?.startChar;
       const mappedBeat = state.scoreNotePositions.get(startChar);
-      const beat = Number.isFinite(mappedBeat) ? mappedBeat : startChar === 0 ? 0 : null;
+      const beat = Number.isFinite(mappedBeat) ? mappedBeat : state.firstScoreBeat;
       if (Number.isFinite(beat)) seekToBeat(beat, true);
     }
   });
@@ -571,8 +572,10 @@ function exerciseToAbc(exercise) {
     ...treble.notePositions.map(({ offset, beat }) => [trebleOffset + offset, beat]),
     ...bass.notePositions.map(({ offset, beat }) => [bassOffset + offset, beat])
   ]);
-  const firstScoreNote = treble.notePositions[0] || bass.notePositions[0];
+  const firstScoreNote = [...treble.notePositions, ...bass.notePositions]
+    .sort((left, right) => left.beat - right.beat)[0];
   if (firstScoreNote) {
+    state.firstScoreBeat = firstScoreNote.beat;
     state.scoreNotePositions.set(0, firstScoreNote.beat);
     state.scoreNotePositions.set(header.length + 1, firstScoreNote.beat);
   }
