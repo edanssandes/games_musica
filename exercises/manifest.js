@@ -5,5 +5,7 @@ window.SIGHT_READING_EXERCISE_FILES = [
   "exercises/d_major_01.js", "exercises/d_major_02.js", "exercises/d_major_03.js", "exercises/d_major_04.js", "exercises/d_major_05.js",
   "exercises/f_major_01.js", "exercises/f_major_02.js", "exercises/f_major_03.js", "exercises/f_major_04.js", "exercises/f_major_05.js",
   "exercises/bb_major_01.js", "exercises/bb_major_02.js", "exercises/bb_major_03.js", "exercises/bb_major_04.js", "exercises/bb_major_05.js",
-  "exercises/eb_major_01.js", "exercises/eb_major_02.js", "exercises/eb_major_03.js", "exercises/eb_major_04.js", "exercises/eb_major_05.js"
+  "exercises/eb_major_01.js", "exercises/eb_major_02.js", "exercises/eb_major_03.js", "exercises/eb_major_04.js", "exercises/eb_major_05.js",
+  "exercises/hands_alternating_01.js", "exercises/hands_alternating_02.js", "exercises/hands_alternating_03.js", "exercises/hands_alternating_04.js", "exercises/hands_alternating_05.js",
+  "exercises/hands_together_01.js", "exercises/hands_together_02.js", "exercises/hands_together_03.js", "exercises/hands_together_04.js", "exercises/hands_together_05.js"
 ];

@@ -1,0 +1,6 @@
+window.registerSightReadingExercise({ id: "ht02", group: "Coordenação · mãos simultâneas", key: "G", title: "2", name: "Baixo em pulso e linha em sol", bpm: 88, notes: [
+  { start: 0, duration: 4, midi: 43, hand: "left" }, { start: 0, duration: 1, midi: 67, hand: "right" }, { start: 1, duration: 1, midi: 71, hand: "right" }, { start: 2, duration: 1, midi: 74, hand: "right" }, { start: 3, duration: 1, midi: 79, hand: "right" },
+  { start: 4, duration: 4, midi: 50, hand: "left" }, { start: 4, duration: 1, midi: 78, hand: "right" }, { start: 5, duration: 1, midi: 74, hand: "right" }, { start: 6, duration: 1, midi: 71, hand: "right" }, { start: 7, duration: 1, midi: 67, hand: "right" },
+  { start: 8, duration: 4, midi: 55, hand: "left" }, { start: 8, duration: 1, midi: 69, hand: "right" }, { start: 9, duration: 1, midi: 72, hand: "right" }, { start: 10, duration: 1, midi: 76, hand: "right" }, { start: 11, duration: 1, midi: 78, hand: "right" },
+  { start: 12, duration: 4, midi: 43, hand: "left" }, { start: 12, duration: 1, midi: 79, hand: "right" }, { start: 13, duration: 1, midi: 74, hand: "right" }, { start: 14, duration: 1, midi: 71, hand: "right" }, { start: 15, duration: 1, midi: 67, hand: "right" }
+] });

@@ -1,0 +1,6 @@
+window.registerSightReadingExercise({ id: "ht04", group: "Coordenação · mãos simultâneas", key: "F", title: "4", name: "Si bemol simultâneo", bpm: 94, notes: [
+  { start: 0, duration: 4, midi: 41, hand: "left" }, { start: 0, duration: 1, midi: 65, hand: "right" }, { start: 1, duration: 1, midi: 70, hand: "right" }, { start: 2, duration: 1, midi: 74, hand: "right" }, { start: 3, duration: 1, midi: 77, hand: "right" },
+  { start: 4, duration: 4, midi: 48, hand: "left" }, { start: 4, duration: 1, midi: 76, hand: "right" }, { start: 5, duration: 1, midi: 72, hand: "right" }, { start: 6, duration: 1, midi: 77, hand: "right" }, { start: 7, duration: 1, midi: 82, hand: "right" },
+  { start: 8, duration: 4, midi: 53, hand: "left" }, { start: 8, duration: 1, midi: 79, hand: "right" }, { start: 9, duration: 1, midi: 77, hand: "right" }, { start: 10, duration: 1, midi: 74, hand: "right" }, { start: 11, duration: 1, midi: 70, hand: "right" },
+  { start: 12, duration: 4, midi: 41, hand: "left" }, { start: 12, duration: 1, midi: 72, hand: "right" }, { start: 13, duration: 1, midi: 70, hand: "right" }, { start: 14, duration: 1, midi: 67, hand: "right" }, { start: 15, duration: 1, midi: 65, hand: "right" }
+] });

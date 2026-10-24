@@ -1,0 +1,6 @@
+window.registerSightReadingExercise({ id: "ht03", group: "Coordenação · mãos simultâneas", key: "D", title: "3", name: "Acompanhamento com ré e lá", bpm: 90, notes: [
+  { start: 0, duration: 4, midi: 50, hand: "left" }, { start: 0, duration: 1, midi: 62, hand: "right" }, { start: 1, duration: 1, midi: 66, hand: "right" }, { start: 2, duration: 1, midi: 69, hand: "right" }, { start: 3, duration: 1, midi: 74, hand: "right" },
+  { start: 4, duration: 4, midi: 57, hand: "left" }, { start: 4, duration: 1, midi: 73, hand: "right" }, { start: 5, duration: 1, midi: 78, hand: "right" }, { start: 6, duration: 1, midi: 76, hand: "right" }, { start: 7, duration: 1, midi: 73, hand: "right" },
+  { start: 8, duration: 4, midi: 54, hand: "left" }, { start: 8, duration: 1, midi: 71, hand: "right" }, { start: 9, duration: 1, midi: 74, hand: "right" }, { start: 10, duration: 1, midi: 78, hand: "right" }, { start: 11, duration: 1, midi: 81, hand: "right" },
+  { start: 12, duration: 4, midi: 50, hand: "left" }, { start: 12, duration: 1, midi: 76, hand: "right" }, { start: 13, duration: 1, midi: 73, hand: "right" }, { start: 14, duration: 1, midi: 69, hand: "right" }, { start: 15, duration: 1, midi: 62, hand: "right" }
+] });
