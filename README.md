@@ -45,8 +45,14 @@ window.registerSightReadingExercise({
 ## Observações
 
 - O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. O timbre é uma aproximação de piano por harmônicos e envelope percussivo, não uma gravação sampleada de grand piano.
-- Há 40 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas e cinco de mãos simultâneas.
+- Há 45 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas, cinco de mãos simultâneas e cinco padrões clássicos de cinco dedos.
+- O grupo “Clássicos · padrão de Hanon nº 1” traz uma adaptação curta do padrão de abertura associado ao primeiro exercício de *Le Pianiste Virtuose*, transposta para dó, sol, fá, ré e si bemol maior. As transposições e a organização para o jogo são adaptações pedagógicas, não uma reprodução integral da edição.
 - ABCJS renderiza as partituras em pauta dupla, com clave de sol e de fá, armadura, barras de compasso e durações musicais. Notas abaixo do dó central vão para a clave de fá.
 - A página não precisa de servidor, mas precisa de conexão com a internet para carregar ABCJS pelo CDN jsDelivr.
 - O tempo padrão é 10 segundos. Use “Configurações” para escolher de 1 a 60 segundos; a escolha fica salva neste navegador.
 - O BPM personalizado também fica salvo no navegador; ao escolher “Usar o andamento do exercício”, volta-se aos valores individuais dos arquivos.
+
+## Referência e licença dos exercícios clássicos
+
+- Charles-Louis Hanon, *Le Pianiste Virtuose* (1873 ou anterior), Exercício 1. A obra original é de domínio público. Referências: [IMSLP — The Virtuoso Pianist](https://imslp.org/wiki/The_Virtuoso_Pianist_(Hanon,_Charles-Louis)) e [Mutopia Project — busca por Hanon](https://www.mutopiaproject.org/cgibin/make-table.cgi?searchingfor=Hanon), que identifica a edição transcrita como CC BY-SA 4.0.
+- Os cinco exercícios desta aplicação são adaptações/transposições do padrão de cinco dedos, preparadas para o formato de dados do jogo. Atribuição: “Baseado no Exercício 1 de *Le Pianiste Virtuose*, de Charles-Louis Hanon”. Este material adaptado é disponibilizado sob [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
