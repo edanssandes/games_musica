@@ -219,6 +219,82 @@ input:focus-visible {
   margin: 0 auto;
 }
 
+#staff svg .abcjs-note {
+  cursor: pointer;
+}
+
+.fullscreen-btn {
+  flex: 0 0 auto;
+}
+
+.app-shell:fullscreen,
+.app-shell.focus-mode {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow: auto;
+  background: #0c1220;
+}
+
+.app-shell:fullscreen .topbar,
+.app-shell:fullscreen .controls-card,
+.app-shell:fullscreen .message-card,
+.app-shell:fullscreen .sheet-header > :first-child,
+.app-shell.focus-mode .topbar,
+.app-shell.focus-mode .controls-card,
+.app-shell.focus-mode .message-card,
+.app-shell.focus-mode .sheet-header > :first-child {
+  display: none;
+}
+
+.app-shell:fullscreen .game-panel,
+.app-shell.focus-mode .game-panel {
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.app-shell:fullscreen .sheet-card,
+.app-shell.focus-mode .sheet-card {
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.app-shell:fullscreen .sheet-header,
+.app-shell.focus-mode .sheet-header {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  z-index: 2;
+  margin: 0;
+}
+
+.app-shell:fullscreen .fullscreen-btn,
+.app-shell.focus-mode .fullscreen-btn {
+  min-height: 42px;
+  padding: 8px 12px;
+}
+
+.app-shell:fullscreen .countdown,
+.app-shell.focus-mode .countdown {
+  order: 0;
+  flex: 0 0 auto;
+  margin: 8px 72px 4px 4px;
+}
+
+.app-shell:fullscreen #staff,
+.app-shell.focus-mode #staff {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .countdown {
   margin: 16px 4px 6px;
 }
@@ -403,9 +479,9 @@ input:focus-visible {
   }
 
   #staff svg {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
+    width: auto;
+    min-width: 600px;
+    max-width: none;
     margin: 0 auto;
   }
 
@@ -435,6 +511,42 @@ input:focus-visible {
     min-height: 48px;
     font-size: 16px;
   }
+
+  .app-shell:fullscreen {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .app-shell:fullscreen #staff {
+    padding: 8px;
+  }
+
+  .app-shell:fullscreen #staff svg {
+    min-width: 680px;
+  }
+}
+
+body.focus-mode-active {
+  overflow: hidden;
+}
+
+.app-shell.focus-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+}
+
+@media (max-width: 680px) {
+  .app-shell.focus-mode {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .app-shell.focus-mode #staff {
+    padding: 8px;
+  }
+
+  .app-shell.focus-mode #staff svg {
+    min-width: 680px;
+  }
 }
 
 @media (max-width: 380px) {
@@ -448,7 +560,6 @@ input:focus-visible {
   }
 
   #staff svg {
-    width: 100%;
-    min-width: 0;
+    min-width: 600px;
   }
 }

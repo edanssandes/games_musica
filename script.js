@@ -44,7 +44,16 @@ const state = {
   currentExerciseIndex: 0,
   currentExercise: null,
   audioContext: null,
+  masterGain: null,
+  activeOscillators: [],
+  volumeLevel: 1.5,
   playbackTimerIds: [],
+  playbackFrameId: null,
+  playbackStartedAt: 0,
+  playbackStartBeat: 0,
+  playbackTotalBeats: 0,
+  playbackBeatDuration: 0,
+  scoreNotePositions: new Map(),
   isPlayingDemo: false,
   exposureTimerId: null,
   exposureFrameId: null,
@@ -69,6 +78,8 @@ const ui = {
   countdownText: document.getElementById("countdownText"),
   progressTrack: document.getElementById("progressTrack"),
   progressFill: document.getElementById("progressFill"),
+  countdownLabel: document.getElementById("countdownLabel"),
+  fullscreenBtn: document.getElementById("fullscreenBtn"),
   modal: document.getElementById("modal"),
   modalText: document.getElementById("modalText"),
   modalRepeatBtn: document.getElementById("modalRepeatBtn"),
@@ -78,6 +89,8 @@ const ui = {
   exposureInput: document.getElementById("exposureInput"),
   tempoModeInput: document.getElementById("tempoModeInput"),
   playbackBpmInput: document.getElementById("playbackBpmInput"),
+  volumeInput: document.getElementById("volumeInput"),
+  volumeValue: document.getElementById("volumeValue"),
   cancelSettingsBtn: document.getElementById("cancelSettingsBtn")
 };
 
@@ -173,7 +186,10 @@ function attachEvents() {
   ui.settingsBtn.addEventListener("click", openSettings);
   ui.cancelSettingsBtn.addEventListener("click", closeSettings);
   ui.tempoModeInput.addEventListener("change", updateTempoInputState);
+  ui.volumeInput.addEventListener("input", updateVolumePreview);
   ui.settingsForm.addEventListener("submit", saveSettings);
+  ui.fullscreenBtn.addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", updateFullscreenButton);
 }
 
 function loadExposureSetting() {
@@ -194,12 +210,25 @@ function loadExposureSetting() {
   } catch {
     state.playbackBpmOverride = null;
   }
+
+  try {
+    const savedVolume = Number(window.localStorage.getItem("sightReadingVolume"));
+    if (Number.isFinite(savedVolume) && savedVolume >= 0.5 && savedVolume <= 2) {
+      state.volumeLevel = savedVolume;
+    }
+  } catch {
+    state.volumeLevel = 1.5;
+  }
+  ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
+  updateVolumePreview();
 }
 
 function openSettings() {
   ui.exposureInput.value = String(state.exposureSeconds);
   ui.tempoModeInput.value = state.playbackBpmOverride === null ? "exercise" : "custom";
   ui.playbackBpmInput.value = String(state.playbackBpmOverride ?? 90);
+  ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
+  updateVolumePreview();
   updateTempoInputState();
   ui.settingsModal.classList.remove("hidden");
   ui.exposureInput.focus();
@@ -230,6 +259,10 @@ function saveSettings(event) {
 
   state.exposureSeconds = value;
   state.playbackBpmOverride = ui.tempoModeInput.value === "custom" ? customBpm : null;
+  state.volumeLevel = Number(ui.volumeInput.value) / 100;
+  if (state.masterGain) {
+    state.masterGain.gain.setTargetAtTime(state.volumeLevel, state.audioContext.currentTime, 0.025);
+  }
   try {
     window.localStorage.setItem("sightReadingExposureSeconds", String(value));
     if (state.playbackBpmOverride === null) {
@@ -237,13 +270,55 @@ function saveSettings(event) {
     } else {
       window.localStorage.setItem("sightReadingPlaybackBpm", String(state.playbackBpmOverride));
     }
+    window.localStorage.setItem("sightReadingVolume", String(state.volumeLevel));
   } catch {
     // A configuração ainda vale nesta sessão, mesmo se o armazenamento estiver indisponível.
   }
 
   closeSettings();
   if (state.currentExercise) renderScore();
-  ui.messageBox.textContent = `Tempo de observação configurado para ${value} segundos.`;
+  ui.messageBox.textContent = `Configurações salvas. Volume do piano: ${Math.round(state.volumeLevel * 100)}%.`;
+}
+
+function updateVolumePreview() {
+  const percent = Number(ui.volumeInput.value);
+  ui.volumeValue.textContent = `${percent}%`;
+  if (state.masterGain && Number.isFinite(percent)) {
+    state.masterGain.gain.setTargetAtTime(percent / 100, state.audioContext.currentTime, 0.025);
+  }
+  if (Number.isFinite(percent)) state.volumeLevel = percent / 100;
+}
+
+async function toggleFullscreen() {
+  const appShell = document.querySelector(".app-shell");
+  if (appShell.classList.contains("focus-mode")) {
+    appShell.classList.remove("focus-mode");
+    document.body.classList.remove("focus-mode-active");
+    updateFullscreenButton();
+    return;
+  }
+
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      if (!appShell.requestFullscreen) throw new Error("Fullscreen API indisponível");
+      await appShell.requestFullscreen();
+    }
+  } catch (error) {
+    appShell.classList.add("focus-mode");
+    document.body.classList.add("focus-mode-active");
+  }
+  updateFullscreenButton();
+}
+
+function updateFullscreenButton() {
+  const isFullscreen = Boolean(document.fullscreenElement) || document.querySelector(".app-shell").classList.contains("focus-mode");
+  ui.fullscreenBtn.setAttribute("aria-label", isFullscreen ? "Sair da tela cheia" : "Abrir em tela cheia");
+  ui.fullscreenBtn.title = isFullscreen ? "Sair da tela cheia" : "Tela cheia";
+  ui.fullscreenBtn.querySelector("span:last-child").textContent = isFullscreen ? "Sair" : "Tela cheia";
+  ui.fullscreenBtn.querySelector(".button-icon").textContent = isFullscreen ? "⤢" : "⛶";
+  if (state.currentExercise) renderScore();
 }
 
 function setExercise(index, startImmediately = false) {
@@ -259,7 +334,7 @@ function setExercise(index, startImmediately = false) {
   ui.exerciseTitle.textContent = state.currentExercise.title;
   ui.exerciseName.textContent = state.currentExercise.name;
   ui.statusPill.textContent = "Pronto";
-  ui.messageBox.textContent = "Escolha outro exercício para iniciar ou toque em “Repetir” para ouvir este.";
+  ui.messageBox.textContent = "Toque em uma nota para ouvir a partir daquele ponto, ou use “Repetir” para começar do início.";
   renderScore();
   if (startImmediately) startExerciseFlow();
 }
@@ -275,6 +350,7 @@ function startExerciseFlow() {
   const exposureSeconds = state.exposureSeconds;
   ui.statusPill.textContent = "Observe";
   ui.messageBox.textContent = `Observe a partitura. A música começa em ${exposureSeconds} segundos.`;
+  ui.countdownLabel.textContent = "Tempo para observar";
   state.exposureStartedAt = performance.now();
   state.exposureDurationMs = exposureSeconds * 1000;
   ui.countdown.hidden = false;
@@ -304,33 +380,74 @@ function playExerciseDemo(exercise) {
     state.exposureFrameId = null;
   }
   state.exposureTimerId = null;
-  ui.countdown.hidden = true;
+  startPlaybackFromBeat(exercise, 0);
+}
 
+function startPlaybackFromBeat(exercise, startBeat, triggerAtClick = false) {
   const beatDuration = 60 / getPlaybackBpm(exercise);
-  const totalDuration = Math.max(...exercise.notes.map((note) => note.start + note.duration)) * beatDuration;
-
+  const totalBeats = Math.max(...exercise.notes.map((note) => note.start + note.duration));
+  const remainingDuration = Math.max(0, (totalBeats - startBeat) * beatDuration);
+  state.playbackStartBeat = startBeat;
+  state.playbackTotalBeats = totalBeats;
+  state.playbackBeatDuration = beatDuration;
+  state.playbackStartedAt = performance.now();
   state.isPlayingDemo = true;
   ui.statusPill.textContent = "Tocando";
-  ui.messageBox.textContent = "Escute a melodia acompanhando a partitura.";
+  ui.messageBox.textContent = "Escute a melodia. Toque em qualquer nota para voltar àquele ponto.";
+  ui.countdown.hidden = false;
+  ui.countdownLabel.textContent = "Reprodução";
+  updatePlaybackProgress();
 
   exercise.notes.forEach((note) => {
-    const timer = window.setTimeout(() => triggerPianoNote(note.midi, note.duration * beatDuration), note.start * beatDuration * 1000);
+    if (note.start < startBeat - 0.0001) return;
+    if (triggerAtClick && Math.abs(note.start - startBeat) < 0.0001) {
+      triggerPianoNote(note.midi, note.duration * beatDuration);
+      return;
+    }
+    const timer = window.setTimeout(() => triggerPianoNote(note.midi, note.duration * beatDuration), (note.start - startBeat) * beatDuration * 1000);
     state.playbackTimerIds.push(timer);
   });
 
   const endTimer = window.setTimeout(() => {
     state.isPlayingDemo = false;
+    state.playbackFrameId = null;
+    ui.countdown.hidden = true;
     ui.statusPill.textContent = "Concluído";
-    ui.messageBox.textContent = "A audição terminou. Você pode repetir ou escolher o próximo exercício.";
+    ui.messageBox.textContent = "A audição terminou. Toque em uma nota para retomá-la dali, repita ou escolha o próximo exercício.";
     openModal("A audição terminou. Quer ouvir este exercício novamente ou seguir para o próximo?");
-  }, totalDuration * 1000 + 250);
+  }, remainingDuration * 1000 + 250);
 
   state.playbackTimerIds.push(endTimer);
+}
+
+function updatePlaybackProgress() {
+  if (!state.isPlayingDemo) return;
+  const elapsedSeconds = (performance.now() - state.playbackStartedAt) / 1000;
+  const currentBeat = Math.min(state.playbackTotalBeats, state.playbackStartBeat + elapsedSeconds / state.playbackBeatDuration);
+  const progress = state.playbackTotalBeats > 0 ? currentBeat / state.playbackTotalBeats : 1;
+  const remainingSeconds = Math.max(0, Math.ceil((state.playbackTotalBeats - currentBeat) * state.playbackBeatDuration));
+  ui.progressFill.style.width = `${progress * 100}%`;
+  ui.progressTrack.setAttribute("aria-valuenow", String(Math.round(progress * 100)));
+  ui.countdownText.textContent = `${remainingSeconds} s`;
+  state.playbackFrameId = window.requestAnimationFrame(updatePlaybackProgress);
+}
+
+function seekToBeat(beat, triggerAtClick = false) {
+  if (!state.currentExercise) return;
+  getAudioContext();
+  clearPlaybackTimers();
+  closeModal();
+  startPlaybackFromBeat(state.currentExercise, beat, triggerAtClick);
 }
 
 function clearPlaybackTimers() {
   state.playbackTimerIds.forEach((timerId) => window.clearTimeout(timerId));
   state.playbackTimerIds = [];
+  if (state.playbackFrameId !== null) {
+    window.cancelAnimationFrame(state.playbackFrameId);
+    state.playbackFrameId = null;
+  }
+  stopActiveNotes();
   if (state.exposureTimerId !== null) {
     window.clearTimeout(state.exposureTimerId);
     state.exposureTimerId = null;
@@ -341,6 +458,17 @@ function clearPlaybackTimers() {
   }
   ui.countdown.hidden = true;
   state.isPlayingDemo = false;
+}
+
+function stopActiveNotes() {
+  state.activeOscillators.forEach((oscillator) => {
+    try {
+      oscillator.stop();
+    } catch {
+      // O oscilador pode já ter terminado naturalmente.
+    }
+  });
+  state.activeOscillators = [];
 }
 
 function advanceExercise(offset) {
@@ -375,11 +503,17 @@ function renderScore() {
   const staffWidth = Math.max(240, ui.staff.clientWidth - 24);
   window.ABCJS.renderAbc(ui.staff, abc, {
     responsive: "resize",
-    staffwidth: compactLayout ? staffWidth : 1100,
-    scale: compactLayout ? 1.05 : 1.35,
+    staffwidth: compactLayout ? Math.max(620, staffWidth) : 1100,
+    scale: compactLayout ? 1.4 : 1.35,
     paddingtop: 12,
     paddingbottom: 12,
-    foregroundColor: "#111"
+    foregroundColor: "#111",
+    clickListener: (abcElement) => {
+      const startChar = abcElement?.startChar;
+      const mappedBeat = state.scoreNotePositions.get(startChar);
+      const beat = Number.isFinite(mappedBeat) ? mappedBeat : startChar === 0 ? 0 : null;
+      if (Number.isFinite(beat)) seekToBeat(beat, true);
+    }
   });
 }
 
@@ -393,7 +527,7 @@ function exerciseToAbc(exercise) {
   const trebleNotes = exercise.notes.filter((note) => note.hand === "right" || (!note.hand && note.midi >= 60));
   const bassNotes = exercise.notes.filter((note) => note.hand === "left" || (!note.hand && note.midi < 60));
 
-  return [
+  const header = [
     `X:1`,
     `T:${exercise.name}`,
     `M:4/4`,
@@ -402,16 +536,30 @@ function exerciseToAbc(exercise) {
     `%%score { (treble) | (bass) }`,
     `V:treble clef=treble`,
     `V:bass clef=bass`,
-    `K:${exercise.key}`,
-    `[V:treble] ${buildVoiceTokens(trebleNotes, measureCount, exercise.key)}`,
-    `[V:bass] ${buildVoiceTokens(bassNotes, measureCount, exercise.key)}`
+    `K:${exercise.key}`
   ].join("\n");
+  const treble = buildVoiceTokens(trebleNotes, measureCount, exercise.key);
+  const bass = buildVoiceTokens(bassNotes, measureCount, exercise.key);
+  const treblePrefix = "[V:treble] ";
+  const bassPrefix = "[V:bass] ";
+  const trebleOffset = header.length + 1 + treblePrefix.length;
+  const bassOffset = trebleOffset + treble.text.length + 1 + bassPrefix.length;
+  state.scoreNotePositions = new Map([
+    ...treble.notePositions.map(({ offset, beat }) => [trebleOffset + offset, beat]),
+    ...bass.notePositions.map(({ offset, beat }) => [bassOffset + offset, beat])
+  ]);
+  const firstScoreNote = treble.notePositions[0] || bass.notePositions[0];
+  if (firstScoreNote) {
+    state.scoreNotePositions.set(0, firstScoreNote.beat);
+    state.scoreNotePositions.set(header.length + 1, firstScoreNote.beat);
+  }
+  return `${header}\n${treblePrefix}${treble.text}\n${bassPrefix}${bass.text}`;
 }
 
 function buildVoiceTokens(notes, measureCount, key) {
   const beatsPerMeasure = 4;
   const totalBeats = measureCount * beatsPerMeasure;
-  const tokens = [];
+  const segments = [];
   let activeNote = null;
 
   for (let beat = 0; beat < totalBeats - 0.0001;) {
@@ -431,12 +579,35 @@ function buildVoiceTokens(notes, measureCount, key) {
     if (duration <= 0) break;
     const pitch = soundingNote ? abcPitch(soundingNote.midi, key) : "z";
     const tie = soundingNote && beat + duration < activeNote.start + activeNote.duration ? "-" : "";
-    tokens.push(`${pitch}${abcLength(duration)}${tie}`);
+    segments.push({
+      text: `${pitch}${abcLength(duration)}${tie}`,
+      start: beat,
+      end: beat + duration,
+      isNote: Boolean(soundingNote),
+      noteStart: soundingNote && Math.abs(beat - soundingNote.start) < 0.0001 ? beat : null
+    });
     beat += duration;
-    if (Math.abs(beat % beatsPerMeasure) < 0.0001) tokens.push("|");
+    if (Math.abs(beat % beatsPerMeasure) < 0.0001) segments.push({ text: "|", isBarline: true });
   }
 
-  return tokens.join(" ");
+  let text = "";
+  const notePositions = [];
+  let previous = null;
+  segments.forEach((segment) => {
+    if (text) {
+      const pairedEighths = previous?.isNote && segment.isNote
+        && Math.abs((previous.end - previous.start) - 0.5) < 0.0001
+        && Math.abs((segment.end - segment.start) - 0.5) < 0.0001
+        && Math.floor(previous.start) === Math.floor(segment.start);
+      text += pairedEighths ? "" : " ";
+    }
+    const offset = text.length;
+    text += segment.text;
+    if (segment.noteStart !== null) notePositions.push({ offset, beat: segment.noteStart });
+    previous = segment;
+  });
+
+  return { text, notePositions };
 }
 
 function abcLength(quarterBeats) {
@@ -466,10 +637,10 @@ function triggerPianoNote(midi, durationSeconds) {
   const now = audioContext.currentTime;
   const frequency = 440 * Math.pow(2, (midi - 69) / 12);
   const partials = [
-    { ratio: 1, level: 0.16 },
-    { ratio: 2.01, level: 0.055 },
-    { ratio: 3.98, level: 0.022 },
-    { ratio: 6.02, level: 0.009 }
+    { ratio: 1, level: 0.32 },
+    { ratio: 2.01, level: 0.11 },
+    { ratio: 3.98, level: 0.045 },
+    { ratio: 6.02, level: 0.018 }
   ];
   const decayTime = Math.max(0.015, Math.min(0.35, durationSeconds * 0.55));
 
@@ -486,9 +657,13 @@ function triggerPianoNote(midi, durationSeconds) {
     envelope.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
 
     oscillator.connect(envelope);
-    envelope.connect(audioContext.destination);
+    envelope.connect(state.masterGain);
     oscillator.start(now);
     oscillator.stop(now + durationSeconds + 0.01);
+    state.activeOscillators.push(oscillator);
+    oscillator.addEventListener("ended", () => {
+      state.activeOscillators = state.activeOscillators.filter((active) => active !== oscillator);
+    }, { once: true });
   });
 
 }
@@ -497,6 +672,16 @@ function getAudioContext() {
   if (!state.audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     state.audioContext = new AudioContextClass();
+    const compressor = state.audioContext.createDynamicsCompressor();
+    state.masterGain = state.audioContext.createGain();
+    state.masterGain.gain.value = state.volumeLevel;
+    compressor.threshold.value = -8;
+    compressor.knee.value = 4;
+    compressor.ratio.value = 12;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.18;
+    state.masterGain.connect(compressor);
+    compressor.connect(state.audioContext.destination);
   }
 
   if (state.audioContext.state === "suspended") {

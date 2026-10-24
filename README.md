@@ -8,7 +8,9 @@ Jogo de treino de leitura melódica em navegador, sem servidor e sem piano desen
 2. Escolha um grupo de tonalidade e um exercício. A troca inicia automaticamente a contagem e a reprodução. “Repetir” reinicia o exercício atual.
 3. Observe a partitura durante o tempo configurado.
 4. Escute a melodia gerada pelo navegador acompanhando a partitura.
-5. Ao fim, escolha repetir ou ir para o próximo exercício.
+5. Toque/clique em uma nota da partitura para reproduzir a partir daquele ponto.
+6. Use “Tela cheia” para manter em foco apenas a partitura e a barra de progresso; pressione Esc ou “Sair” para voltar aos controles.
+7. Ao fim, escolha repetir ou ir para o próximo exercício.
 
 ## Estrutura
 
@@ -50,7 +52,7 @@ window.registerSightReadingExercise({
 - ABCJS renderiza as partituras em pauta dupla, com clave de sol e de fá, armadura, barras de compasso e durações musicais. Notas abaixo do dó central vão para a clave de fá.
 - A página não precisa de servidor, mas precisa de conexão com a internet para carregar ABCJS pelo CDN jsDelivr.
 - O tempo padrão é 10 segundos. Use “Configurações” para escolher de 1 a 60 segundos; a escolha fica salva neste navegador.
-- O BPM personalizado também fica salvo no navegador; ao escolher “Usar o andamento do exercício”, volta-se aos valores individuais dos arquivos.
+- O BPM personalizado e o volume do piano também ficam salvos no navegador; ao escolher “Usar o andamento do exercício”, volta-se aos valores individuais dos arquivos.
 
 ## Referência e licença dos exercícios clássicos
 

@@ -43,18 +43,19 @@
               <p class="sheet-kicker" id="exerciseTitle">Exercício 1</p>
               <h2 id="exerciseName">Escala de início</h2>
             </div>
+            <button id="fullscreenBtn" class="secondary-btn icon-btn fullscreen-btn" type="button" aria-label="Abrir em tela cheia" title="Tela cheia"><span class="button-icon" aria-hidden="true">⛶</span><span>Tela cheia</span></button>
           </div>
 
-          <div id="staff" role="img" aria-label="Partitura do exercício"></div>
           <div id="countdown" class="countdown" hidden aria-live="polite">
             <div class="countdown-label">
-              <span>Tempo para observar</span>
+              <span id="countdownLabel">Tempo para observar</span>
               <strong id="countdownText">10 s</strong>
             </div>
             <div id="progressTrack" class="progress-track" role="progressbar" aria-label="Tempo restante para observar a partitura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
               <div id="progressFill" class="progress-fill"></div>
             </div>
           </div>
+          <div id="staff" role="img" aria-label="Partitura do exercício"></div>
         </section>
 
         <section class="message-card">
@@ -98,6 +99,10 @@
             <input id="playbackBpmInput" type="number" min="40" max="180" step="1" value="90" disabled />
             <span>BPM</span>
           </span>
+        </label>
+        <label class="setting-field" for="volumeInput">
+          <span>Volume do piano <strong id="volumeValue">150%</strong></span>
+          <input id="volumeInput" type="range" min="50" max="200" step="5" value="150" />
         </label>
         <div class="modal-actions">
           <button id="cancelSettingsBtn" type="button" class="secondary-btn">Cancelar</button>
