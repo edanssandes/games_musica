@@ -43,10 +43,13 @@ window.registerSightReadingExercise = (exercise) => {
 const state = {
   currentExerciseIndex: 0,
   currentExercise: null,
+  groupExerciseIndexes: new Map(),
   audioContext: null,
   masterGain: null,
   activeOscillators: [],
   volumeLevel: 1.5,
+  noteSizeLevel: 1.15,
+  audioTimbre: "grand",
   playbackTimerIds: [],
   playbackFrameId: null,
   playbackStartedAt: 0,
@@ -54,7 +57,6 @@ const state = {
   playbackTotalBeats: 0,
   playbackBeatDuration: 0,
   scoreNotePositions: new Map(),
-  firstScoreBeat: 0,
   isPlayingDemo: false,
   exposureTimerId: null,
   exposureFrameId: null,
@@ -69,6 +71,9 @@ const ui = {
   exerciseSelect: document.getElementById("exerciseSelect"),
   repeatBtn: document.getElementById("repeatBtn"),
   nextBtn: document.getElementById("nextBtn"),
+  fullscreenPrevBtn: document.getElementById("fullscreenPrevBtn"),
+  fullscreenRepeatBtn: document.getElementById("fullscreenRepeatBtn"),
+  fullscreenNextBtn: document.getElementById("fullscreenNextBtn"),
   settingsBtn: document.getElementById("settingsBtn"),
   exerciseTitle: document.getElementById("exerciseTitle"),
   exerciseName: document.getElementById("exerciseName"),
@@ -92,6 +97,9 @@ const ui = {
   playbackBpmInput: document.getElementById("playbackBpmInput"),
   volumeInput: document.getElementById("volumeInput"),
   volumeValue: document.getElementById("volumeValue"),
+  noteSizeInput: document.getElementById("noteSizeInput"),
+  noteSizeValue: document.getElementById("noteSizeValue"),
+  timbreInput: document.getElementById("timbreInput"),
   cancelSettingsBtn: document.getElementById("cancelSettingsBtn")
 };
 
@@ -114,17 +122,26 @@ function init() {
 
 function loadExerciseFiles() {
   const files = window.SIGHT_READING_EXERCISE_FILES || [];
-  return files.reduce((queue, filePath) => queue.then(() => new Promise((resolve, reject) => {
+  return Promise.all(files.map((filePath) => new Promise((resolve, reject) => {
     const script = document.createElement("script");
+    // Fetch in parallel but execute in manifest order.
+    script.async = false;
     script.src = new URL(filePath, document.baseURI).href;
     script.onload = resolve;
     script.onerror = () => reject(new Error(`Falha ao carregar ${filePath}`));
     document.head.appendChild(script);
-  })), Promise.resolve());
+  })));
 }
 
 function populateGroupOptions() {
   const groups = [...new Set(EXERCISES.map((exercise) => exercise.group))];
+  state.groupExerciseIndexes = new Map(groups.map((group) => [
+    group,
+    EXERCISES.reduce((indexes, exercise, index) => {
+      if (exercise.group === group) indexes.push(index);
+      return indexes;
+    }, [])
+  ]));
   ui.groupSelect.replaceChildren();
   groups.forEach((group) => {
     const option = document.createElement("option");
@@ -174,6 +191,10 @@ function attachEvents() {
     advanceExercise(1);
   });
 
+  ui.fullscreenPrevBtn.addEventListener("click", () => advanceExercise(-1));
+  ui.fullscreenRepeatBtn.addEventListener("click", startExerciseFlow);
+  ui.fullscreenNextBtn.addEventListener("click", () => advanceExercise(1));
+
   ui.modalRepeatBtn.addEventListener("click", () => {
     closeModal();
     startExerciseFlow();
@@ -188,6 +209,7 @@ function attachEvents() {
   ui.cancelSettingsBtn.addEventListener("click", closeSettings);
   ui.tempoModeInput.addEventListener("change", updateTempoInputState);
   ui.volumeInput.addEventListener("input", updateVolumePreview);
+  ui.noteSizeInput.addEventListener("input", updateNoteSizePreview);
   ui.settingsForm.addEventListener("submit", saveSettings);
   ui.fullscreenBtn.addEventListener("click", toggleFullscreen);
   document.addEventListener("fullscreenchange", () => {
@@ -223,7 +245,24 @@ function loadExposureSetting() {
   } catch {
     state.volumeLevel = 1.5;
   }
+  try {
+    const savedNoteSize = Number(window.localStorage.getItem("sightReadingNoteSize"));
+    if (Number.isFinite(savedNoteSize) && savedNoteSize >= 0.9 && savedNoteSize <= 1.4) {
+      state.noteSizeLevel = savedNoteSize;
+    }
+  } catch {
+    state.noteSizeLevel = 1.15;
+  }
+  try {
+    const savedTimbre = window.localStorage.getItem("sightReadingTimbre");
+    if (["grand", "soft", "bright"].includes(savedTimbre)) state.audioTimbre = savedTimbre;
+  } catch {
+    state.audioTimbre = "grand";
+  }
   ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
+  ui.noteSizeInput.value = String(Math.round(state.noteSizeLevel * 100));
+  ui.timbreInput.value = state.audioTimbre;
+  updateNoteSizePreview();
   updateVolumePreview();
 }
 
@@ -232,6 +271,9 @@ function openSettings() {
   ui.tempoModeInput.value = state.playbackBpmOverride === null ? "exercise" : "custom";
   ui.playbackBpmInput.value = String(state.playbackBpmOverride ?? 90);
   ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
+  ui.noteSizeInput.value = String(Math.round(state.noteSizeLevel * 100));
+  ui.timbreInput.value = state.audioTimbre;
+  updateNoteSizePreview();
   updateVolumePreview();
   updateTempoInputState();
   ui.settingsModal.classList.remove("hidden");
@@ -245,6 +287,14 @@ function updateTempoInputState() {
 
 function closeSettings() {
   ui.settingsModal.classList.add("hidden");
+  ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
+  ui.volumeValue.textContent = `${Math.round(state.volumeLevel * 100)}%`;
+  ui.noteSizeInput.value = String(Math.round(state.noteSizeLevel * 100));
+  ui.timbreInput.value = state.audioTimbre;
+  updateNoteSizePreview();
+  if (state.masterGain) {
+    state.masterGain.gain.setTargetAtTime(state.volumeLevel, state.audioContext.currentTime, 0.025);
+  }
 }
 
 function saveSettings(event) {
@@ -264,6 +314,8 @@ function saveSettings(event) {
   state.exposureSeconds = value;
   state.playbackBpmOverride = ui.tempoModeInput.value === "custom" ? customBpm : null;
   state.volumeLevel = Number(ui.volumeInput.value) / 100;
+  state.noteSizeLevel = Number(ui.noteSizeInput.value) / 100;
+  state.audioTimbre = ui.timbreInput.value;
   if (state.masterGain) {
     state.masterGain.gain.setTargetAtTime(state.volumeLevel, state.audioContext.currentTime, 0.025);
   }
@@ -275,13 +327,15 @@ function saveSettings(event) {
       window.localStorage.setItem("sightReadingPlaybackBpm", String(state.playbackBpmOverride));
     }
     window.localStorage.setItem("sightReadingVolume", String(state.volumeLevel));
+    window.localStorage.setItem("sightReadingNoteSize", String(state.noteSizeLevel));
+    window.localStorage.setItem("sightReadingTimbre", state.audioTimbre);
   } catch {
     // A configuração ainda vale nesta sessão, mesmo se o armazenamento estiver indisponível.
   }
 
   closeSettings();
   if (state.currentExercise) renderScore();
-  ui.messageBox.textContent = `Configurações salvas. Volume do piano: ${Math.round(state.volumeLevel * 100)}%.`;
+  ui.messageBox.textContent = `Configurações salvas. Volume: ${Math.round(state.volumeLevel * 100)}%; notas: ${Math.round(state.noteSizeLevel * 100)}%; timbre: ${ui.timbreInput.selectedOptions[0].textContent}.`;
 }
 
 function updateVolumePreview() {
@@ -290,7 +344,11 @@ function updateVolumePreview() {
   if (state.masterGain && Number.isFinite(percent)) {
     state.masterGain.gain.setTargetAtTime(percent / 100, state.audioContext.currentTime, 0.025);
   }
-  if (Number.isFinite(percent)) state.volumeLevel = percent / 100;
+}
+
+function updateNoteSizePreview() {
+  const percent = Number(ui.noteSizeInput.value);
+  ui.noteSizeValue.textContent = `${percent}%`;
 }
 
 async function toggleFullscreen() {
@@ -496,9 +554,7 @@ function stopActiveNotes() {
 
 function advanceExercise(offset) {
   if (!state.currentExercise) return;
-  const groupIndexes = EXERCISES
-    .map((exercise, index) => exercise.group === state.currentExercise.group ? index : -1)
-    .filter((index) => index >= 0);
+  const groupIndexes = state.groupExerciseIndexes.get(state.currentExercise.group) || [];
   const currentPosition = groupIndexes.indexOf(state.currentExerciseIndex);
   const nextPosition = (currentPosition + offset + groupIndexes.length) % groupIndexes.length;
   const nextIndex = groupIndexes[nextPosition];
@@ -528,15 +584,14 @@ function renderScore() {
   window.ABCJS.renderAbc(ui.staff, abc, {
     responsive: "resize",
     staffwidth: compactLayout ? Math.max(620, staffWidth) : 1100,
-    scale: compactLayout ? (fullscreenLayout ? 1.95 : 1.75) : 1.35,
+    scale: (compactLayout ? (fullscreenLayout ? 1.8 : 1.65) : 1.45) * state.noteSizeLevel,
     paddingtop: 12,
     paddingbottom: 12,
     foregroundColor: "#111",
     clickListener: (abcElement) => {
       const startChar = abcElement?.startChar;
       const mappedBeat = state.scoreNotePositions.get(startChar);
-      const beat = Number.isFinite(mappedBeat) ? mappedBeat : state.firstScoreBeat;
-      if (Number.isFinite(beat)) seekToBeat(beat, true);
+      if (Number.isFinite(mappedBeat)) seekToBeat(mappedBeat, true);
     }
   });
 }
@@ -572,13 +627,6 @@ function exerciseToAbc(exercise) {
     ...treble.notePositions.map(({ offset, beat }) => [trebleOffset + offset, beat]),
     ...bass.notePositions.map(({ offset, beat }) => [bassOffset + offset, beat])
   ]);
-  const firstScoreNote = [...treble.notePositions, ...bass.notePositions]
-    .sort((left, right) => left.beat - right.beat)[0];
-  if (firstScoreNote) {
-    state.firstScoreBeat = firstScoreNote.beat;
-    state.scoreNotePositions.set(0, firstScoreNote.beat);
-    state.scoreNotePositions.set(header.length + 1, firstScoreNote.beat);
-  }
   return `${header}\n${treblePrefix}${treble.text}\n${bassPrefix}${bass.text}`;
 }
 
@@ -610,7 +658,7 @@ function buildVoiceTokens(notes, measureCount, key) {
       start: beat,
       end: beat + duration,
       isNote: Boolean(soundingNote),
-      noteStart: soundingNote && Math.abs(beat - soundingNote.start) < 0.0001 ? beat : null
+      noteStart: soundingNote ? soundingNote.start : null
     });
     beat += duration;
     if (Math.abs(beat % beatsPerMeasure) < 0.0001) segments.push({ text: "|", isBarline: true });
@@ -629,7 +677,16 @@ function buildVoiceTokens(notes, measureCount, key) {
     }
     const offset = text.length;
     text += segment.text;
-    if (segment.noteStart !== null) notePositions.push({ offset, beat: segment.noteStart });
+    if (Number.isFinite(segment.noteStart)) {
+      // ABCJS includes the preceding space in startChar after voice markers
+      // and barlines. Offset -1 addresses the space in the voice prefix.
+      if (offset === 0 || text[offset - 1] === " ") {
+        notePositions.push({ offset: offset - 1, beat: segment.noteStart });
+      }
+      for (let characterOffset = 0; characterOffset < segment.text.length; characterOffset += 1) {
+        notePositions.push({ offset: offset + characterOffset, beat: segment.noteStart });
+      }
+    }
     previous = segment;
   });
 
@@ -662,12 +719,21 @@ function triggerPianoNote(midi, durationSeconds) {
   const audioContext = getAudioContext();
   const now = audioContext.currentTime;
   const frequency = 440 * Math.pow(2, (midi - 69) / 12);
-  const partials = [
-    { ratio: 1, level: 0.32 },
-    { ratio: 2.01, level: 0.11 },
-    { ratio: 3.98, level: 0.045 },
-    { ratio: 6.02, level: 0.018 }
-  ];
+  const timbres = {
+    grand: [
+      { ratio: 1, level: 0.46 }, { ratio: 2.01, level: 0.15 },
+      { ratio: 3.98, level: 0.055 }, { ratio: 6.02, level: 0.02 }
+    ],
+    soft: [
+      { ratio: 1, level: 0.5 }, { ratio: 2.01, level: 0.1 },
+      { ratio: 3.98, level: 0.025 }, { ratio: 6.02, level: 0.008 }
+    ],
+    bright: [
+      { ratio: 1, level: 0.39 }, { ratio: 2.01, level: 0.2 },
+      { ratio: 3.98, level: 0.085 }, { ratio: 6.02, level: 0.035 }
+    ]
+  };
+  const partials = timbres[state.audioTimbre] || timbres.grand;
   const decayTime = Math.max(0.015, Math.min(0.35, durationSeconds * 0.55));
 
   partials.forEach(({ ratio, level }) => {
@@ -679,7 +745,8 @@ function triggerPianoNote(midi, durationSeconds) {
     oscillator.frequency.setValueAtTime(partialFrequency, now);
     envelope.gain.setValueAtTime(0.0001, now);
     envelope.gain.exponentialRampToValueAtTime(level, now + 0.006);
-    envelope.gain.exponentialRampToValueAtTime(Math.max(0.0002, level * 0.16), now + decayTime);
+    const sustainLevel = Math.max(0.0002, level * (ratio === 1 ? 0.12 : 0.025));
+    envelope.gain.exponentialRampToValueAtTime(sustainLevel, now + decayTime);
     envelope.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
 
     oscillator.connect(envelope);
@@ -701,12 +768,17 @@ function getAudioContext() {
     const compressor = state.audioContext.createDynamicsCompressor();
     state.masterGain = state.audioContext.createGain();
     state.masterGain.gain.value = state.volumeLevel;
+    const bassBoost = state.audioContext.createBiquadFilter();
+    bassBoost.type = "lowshelf";
+    bassBoost.frequency.value = 220;
+    bassBoost.gain.value = 5;
     compressor.threshold.value = -8;
     compressor.knee.value = 4;
     compressor.ratio.value = 12;
     compressor.attack.value = 0.003;
     compressor.release.value = 0.18;
-    state.masterGain.connect(compressor);
+    state.masterGain.connect(bassBoost);
+    bassBoost.connect(compressor);
     compressor.connect(state.audioContext.destination);
   }
 

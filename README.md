@@ -9,7 +9,7 @@ Jogo de treino de leitura melódica em navegador, sem servidor e sem piano desen
 3. Observe a partitura durante o tempo configurado.
 4. Escute a melodia gerada pelo navegador acompanhando a partitura.
 5. Toque/clique em uma nota da partitura para reproduzir a partir daquele ponto.
-6. Use “Tela cheia” para manter em foco apenas a partitura e a barra de progresso; pressione Esc ou “Sair” para voltar aos controles.
+6. Use “Tela cheia” para manter em foco a partitura e a barra de progresso; os controles permitem voltar, repetir ou avançar sem sair desse modo. Pressione Esc ou “Sair” para voltar aos controles completos.
 7. Ao fim, escolha repetir ou ir para o próximo exercício.
 
 ## Estrutura
@@ -50,13 +50,13 @@ O grupo “Leitura à primeira vista · iniciante” contém 12 exercícios auto
 
 ## Observações
 
-- O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. O timbre é uma aproximação de piano por harmônicos e envelope percussivo, não uma gravação sampleada de grand piano.
+- O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. As configurações permitem escolher volume e entre três variações de timbre de piano; continuam sendo sínteses, não gravações sampleadas de um piano acústico.
 - Há 57 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas, cinco de mãos simultâneas, cinco padrões clássicos de cinco dedos e 12 exercícios autorais de leitura à primeira vista.
 - O grupo “Clássicos · padrão de Hanon nº 1” traz uma adaptação curta do padrão de abertura associado ao primeiro exercício de *Le Pianiste Virtuose*, transposta para dó, sol, fá, ré e si bemol maior. As transposições e a organização para o jogo são adaptações pedagógicas, não uma reprodução integral da edição.
 - ABCJS renderiza as partituras em pauta dupla, com clave de sol e de fá, armadura, barras de compasso e durações musicais. Notas abaixo do dó central vão para a clave de fá.
 - A página não precisa de servidor, mas precisa de conexão com a internet para carregar ABCJS pelo CDN jsDelivr.
 - O tempo padrão é 10 segundos. Use “Configurações” para escolher de 1 a 60 segundos; a escolha fica salva neste navegador.
-- O BPM personalizado e o volume do piano também ficam salvos no navegador; ao escolher “Usar o andamento do exercício”, volta-se aos valores individuais dos arquivos.
+- O BPM personalizado, o volume, o tamanho das notas e o timbre também ficam salvos no navegador; ao escolher “Usar o andamento do exercício”, volta-se aos valores individuais dos arquivos.
 
 ## Referência e licença dos exercícios clássicos
 

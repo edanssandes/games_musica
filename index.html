@@ -46,6 +46,12 @@
             <button id="fullscreenBtn" class="secondary-btn icon-btn fullscreen-btn" type="button" aria-label="Abrir em tela cheia" title="Tela cheia"><span class="button-icon" aria-hidden="true">⛶</span><span>Tela cheia</span></button>
           </div>
 
+          <nav class="fullscreen-controls" aria-label="Controles do exercício em tela cheia">
+            <button id="fullscreenPrevBtn" class="secondary-btn icon-btn" type="button" aria-label="Exercício anterior" title="Anterior"><span class="button-icon" aria-hidden="true">⏮︎</span><span>Anterior</span></button>
+            <button id="fullscreenRepeatBtn" class="secondary-btn icon-btn" type="button" aria-label="Repetir exercício" title="Repetir"><span class="button-icon" aria-hidden="true">↻</span><span>Repetir</span></button>
+            <button id="fullscreenNextBtn" class="secondary-btn icon-btn" type="button" aria-label="Próximo exercício" title="Próximo"><span class="button-icon" aria-hidden="true">⏭︎</span><span>Próximo</span></button>
+          </nav>
+
           <div id="countdown" class="countdown" hidden aria-live="polite">
             <div class="countdown-label">
               <span id="countdownLabel">Tempo para observar</span>
@@ -103,6 +109,18 @@
         <label class="setting-field" for="volumeInput">
           <span>Volume do piano <strong id="volumeValue">150%</strong></span>
           <input id="volumeInput" type="range" min="50" max="200" step="5" value="150" />
+        </label>
+        <label class="setting-field" for="noteSizeInput">
+          <span>Tamanho das notas <strong id="noteSizeValue">115%</strong></span>
+          <input id="noteSizeInput" type="range" min="90" max="140" step="5" value="115" />
+        </label>
+        <label class="setting-field" for="timbreInput">
+          <span>Timbre</span>
+          <select id="timbreInput">
+            <option value="grand">Piano clássico</option>
+            <option value="soft">Piano suave</option>
+            <option value="bright">Piano brilhante</option>
+          </select>
         </label>
         <div class="modal-actions">
           <button id="cancelSettingsBtn" type="button" class="secondary-btn">Cancelar</button>
