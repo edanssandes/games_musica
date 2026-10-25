@@ -18,6 +18,16 @@ const KEY_SIGNATURES = {
 };
 const FLAT_KEYS = new Set(["F", "Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fm", "Gm", "Cm", "Bbm", "Ebm", "Abm"]);
 
+// Harmônicos, corpo, decaimento e cauda próprios de cada instrumento sintetizado.
+const PIANO_TIMBRES = {
+  grand: { partials: [[1, 1], [2.002, 0.32], [3.006, 0.14], [4.012, 0.06], [6.024, 0.025]], body: 0.55, decay: 2.4, release: 0.65, attack: 0.006 },
+  soft: { partials: [[1, 1], [2.001, 0.18], [3.004, 0.045], [4.008, 0.015]], body: 0.65, decay: 3.2, release: 0.9, attack: 0.012 },
+  bright: { partials: [[1, 1], [2.003, 0.5], [3.009, 0.24], [4.018, 0.12], [6.036, 0.055]], body: 0.45, decay: 1.8, release: 0.45, attack: 0.004 },
+  sustained: { partials: [[1, 1], [2.001, 0.25], [3.004, 0.09], [4.009, 0.035]], body: 0.8, decay: 6, release: 2.4, attack: 0.009 },
+  felt: { partials: [[1, 1], [2, 0.11], [3.002, 0.025]], body: 0.75, decay: 4.5, release: 1.5, attack: 0.02 },
+  electric: { partials: [[1, 1], [2, 0.12], [3, 0.3], [7, 0.12]], body: 0.7, decay: 4, release: 1.8, attack: 0.007 }
+};
+
 window.registerSightReadingExercise = (exercise) => {
   const normalizedNotes = [];
   let nextStart = 0;
@@ -45,8 +55,10 @@ const state = {
   currentExercise: null,
   groupExerciseIndexes: new Map(),
   audioContext: null,
+  pianoBus: null,
   masterGain: null,
   activeOscillators: [],
+  audioPreviewActive: false,
   volumeLevel: 1.5,
   noteSizeLevel: 1.15,
   audioTimbre: "grand",
@@ -100,6 +112,9 @@ const ui = {
   noteSizeInput: document.getElementById("noteSizeInput"),
   noteSizeValue: document.getElementById("noteSizeValue"),
   timbreInput: document.getElementById("timbreInput"),
+  testSoundBtn: document.getElementById("testSoundBtn"),
+  soundPreviewStatus: document.getElementById("soundPreviewStatus"),
+  noteSizePreview: document.getElementById("noteSizePreview"),
   cancelSettingsBtn: document.getElementById("cancelSettingsBtn")
 };
 
@@ -210,6 +225,7 @@ function attachEvents() {
   ui.tempoModeInput.addEventListener("change", updateTempoInputState);
   ui.volumeInput.addEventListener("input", updateVolumePreview);
   ui.noteSizeInput.addEventListener("input", updateNoteSizePreview);
+  ui.testSoundBtn.addEventListener("click", previewPianoSound);
   ui.settingsForm.addEventListener("submit", saveSettings);
   ui.fullscreenBtn.addEventListener("click", toggleFullscreen);
   document.addEventListener("fullscreenchange", () => {
@@ -238,8 +254,9 @@ function loadExposureSetting() {
   }
 
   try {
-    const savedVolume = Number(window.localStorage.getItem("sightReadingVolume"));
-    if (Number.isFinite(savedVolume) && savedVolume >= 0.5 && savedVolume <= 2) {
+    const storedVolume = window.localStorage.getItem("sightReadingVolume");
+    const savedVolume = Number(storedVolume);
+    if (storedVolume !== null && Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 2) {
       state.volumeLevel = savedVolume;
     }
   } catch {
@@ -255,7 +272,7 @@ function loadExposureSetting() {
   }
   try {
     const savedTimbre = window.localStorage.getItem("sightReadingTimbre");
-    if (["grand", "soft", "bright"].includes(savedTimbre)) state.audioTimbre = savedTimbre;
+    if (Object.hasOwn(PIANO_TIMBRES, savedTimbre)) state.audioTimbre = savedTimbre;
   } catch {
     state.audioTimbre = "grand";
   }
@@ -273,10 +290,11 @@ function openSettings() {
   ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
   ui.noteSizeInput.value = String(Math.round(state.noteSizeLevel * 100));
   ui.timbreInput.value = state.audioTimbre;
+  ui.soundPreviewStatus.textContent = "Use “Testar som” para comparar o volume e o timbre antes de salvar.";
+  ui.settingsModal.classList.remove("hidden");
   updateNoteSizePreview();
   updateVolumePreview();
   updateTempoInputState();
-  ui.settingsModal.classList.remove("hidden");
   ui.exposureInput.focus();
 }
 
@@ -286,6 +304,7 @@ function updateTempoInputState() {
 }
 
 function closeSettings() {
+  if (state.audioPreviewActive) stopActiveNotes();
   ui.settingsModal.classList.add("hidden");
   ui.volumeInput.value = String(Math.round(state.volumeLevel * 100));
   ui.volumeValue.textContent = `${Math.round(state.volumeLevel * 100)}%`;
@@ -349,6 +368,35 @@ function updateVolumePreview() {
 function updateNoteSizePreview() {
   const percent = Number(ui.noteSizeInput.value);
   ui.noteSizeValue.textContent = `${percent}%`;
+  if (!ui.settingsModal.classList.contains("hidden") && window.ABCJS) {
+    window.ABCJS.renderAbc(ui.noteSizePreview, "X:1\nM:4/4\nL:1/4\nK:C\nC D E F |", {
+      scale: 1.45 * percent / 100,
+      staffwidth: 200,
+      paddingtop: 8,
+      paddingbottom: 8,
+      foregroundColor: "#111"
+    });
+  }
+}
+
+async function previewPianoSound() {
+  try {
+    // Inicializar/resumir no próprio clique evita bloqueios de autoplay.
+    const audioContext = getAudioContext();
+    await audioContext.resume();
+    clearPlaybackTimers();
+    closeModal();
+    state.audioPreviewActive = true;
+    const timbre = ui.timbreInput.value;
+    triggerPianoNote(60, 1.4, timbre);
+    triggerPianoNote(64, 1.4, timbre);
+    triggerPianoNote(67, 1.4, timbre);
+    ui.statusPill.textContent = "Teste de som";
+    ui.soundPreviewStatus.textContent = `Teste: ${ui.timbreInput.selectedOptions[0].textContent}, volume ${ui.volumeInput.value}%. Ajuste o volume enquanto o acorde soa ou teste novamente.`;
+  } catch (error) {
+    console.error("Falha no teste de som:", error);
+    ui.soundPreviewStatus.textContent = "Não foi possível iniciar o áudio. Confira o som e as permissões deste navegador.";
+  }
 }
 
 async function toggleFullscreen() {
@@ -550,6 +598,7 @@ function stopActiveNotes() {
     }
   });
   state.activeOscillators = [];
+  state.audioPreviewActive = false;
 }
 
 function advanceExercise(offset) {
@@ -580,11 +629,16 @@ function renderScore() {
   const abc = exerciseToAbc(exercise);
   const compactLayout = window.matchMedia("(max-width: 680px), (pointer: coarse) and (max-height: 500px)").matches;
   const fullscreenLayout = Boolean(document.fullscreenElement) || document.querySelector(".app-shell").classList.contains("focus-mode");
-  const staffWidth = Math.max(240, ui.staff.clientWidth - 24);
+  const staffStyle = window.getComputedStyle(ui.staff);
+  const staffWidth = Math.max(240, ui.staff.clientWidth - parseFloat(staffStyle.paddingLeft) - parseFloat(staffStyle.paddingRight));
+  const baseScale = compactLayout ? (fullscreenLayout ? 1.8 : 1.65) : 1.45;
+  const scale = baseScale * state.noteSizeLevel;
   window.ABCJS.renderAbc(ui.staff, abc, {
-    responsive: "resize",
-    staffwidth: compactLayout ? Math.max(620, staffWidth) : 1100,
-    scale: (compactLayout ? (fullscreenLayout ? 1.8 : 1.65) : 1.45) * state.noteSizeLevel,
+    // Um SVG responsivo ajusta a largura e anula visualmente a escala.
+    // Manter as dimensões reais; a área da partitura oferece rolagem se necessário.
+    staffwidth: Math.max(240, staffWidth / scale - 40),
+    wrap: { minSpacing: 1.8, maxSpacing: 2.7, preferredMeasuresPerLine: 4 },
+    scale,
     paddingtop: 12,
     paddingbottom: 12,
     foregroundColor: "#111",
@@ -715,46 +769,43 @@ function abcPitch(midi, key) {
   return `${abcAccidental}${pitch}${octaveMark}`;
 }
 
-function triggerPianoNote(midi, durationSeconds) {
+function triggerPianoNote(midi, durationSeconds, timbre = state.audioTimbre) {
   const audioContext = getAudioContext();
   const now = audioContext.currentTime;
   const frequency = 440 * Math.pow(2, (midi - 69) / 12);
-  const timbres = {
-    grand: [
-      { ratio: 1, level: 0.46 }, { ratio: 2.01, level: 0.15 },
-      { ratio: 3.98, level: 0.055 }, { ratio: 6.02, level: 0.02 }
-    ],
-    soft: [
-      { ratio: 1, level: 0.5 }, { ratio: 2.01, level: 0.1 },
-      { ratio: 3.98, level: 0.025 }, { ratio: 6.02, level: 0.008 }
-    ],
-    bright: [
-      { ratio: 1, level: 0.39 }, { ratio: 2.01, level: 0.2 },
-      { ratio: 3.98, level: 0.085 }, { ratio: 6.02, level: 0.035 }
-    ]
-  };
-  const partials = timbres[state.audioTimbre] || timbres.grand;
-  const decayTime = Math.max(0.015, Math.min(0.35, durationSeconds * 0.55));
+  const profile = PIANO_TIMBRES[timbre] || PIANO_TIMBRES.grand;
+  const hold = Math.max(0.04, durationSeconds);
+  const decayTime = Math.min(0.22, hold * 0.4);
+  const weightSum = profile.partials.reduce((sum, [, weight]) => sum + weight, 0);
 
-  partials.forEach(({ ratio, level }) => {
+  profile.partials.forEach(([ratio, weight]) => {
     const oscillator = audioContext.createOscillator();
     const envelope = audioContext.createGain();
     const partialFrequency = frequency * ratio;
+    if (partialFrequency >= audioContext.sampleRate / 2) return;
+    // Reserva dinâmica para acordes e para o volume de até 200%.
+    const level = 0.24 * weight / weightSum;
+    const harmonicDecay = profile.decay / Math.sqrt(ratio);
+    const bodyLevel = level * profile.body / Math.sqrt(ratio);
+    const heldLevel = Math.max(0.00002, bodyLevel * Math.exp(-(hold - decayTime) / harmonicDecay));
+    const release = profile.release / Math.sqrt(ratio);
 
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(partialFrequency, now);
-    envelope.gain.setValueAtTime(0.0001, now);
-    envelope.gain.exponentialRampToValueAtTime(level, now + 0.006);
-    const sustainLevel = Math.max(0.0002, level * (ratio === 1 ? 0.12 : 0.025));
-    envelope.gain.exponentialRampToValueAtTime(sustainLevel, now + decayTime);
-    envelope.gain.exponentialRampToValueAtTime(0.0001, now + durationSeconds);
+    envelope.gain.setValueAtTime(0.00001, now);
+    envelope.gain.exponentialRampToValueAtTime(level, now + Math.min(profile.attack, decayTime / 2));
+    envelope.gain.exponentialRampToValueAtTime(bodyLevel, now + decayTime);
+    envelope.gain.exponentialRampToValueAtTime(heldLevel, now + hold);
+    envelope.gain.exponentialRampToValueAtTime(0.00001, now + hold + release);
 
     oscillator.connect(envelope);
-    envelope.connect(state.masterGain);
+    envelope.connect(state.pianoBus);
     oscillator.start(now);
-    oscillator.stop(now + durationSeconds + 0.01);
+    oscillator.stop(now + hold + release + 0.02);
     state.activeOscillators.push(oscillator);
     oscillator.addEventListener("ended", () => {
+      oscillator.disconnect();
+      envelope.disconnect();
       state.activeOscillators = state.activeOscillators.filter((active) => active !== oscillator);
     }, { once: true });
   });
@@ -766,20 +817,23 @@ function getAudioContext() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     state.audioContext = new AudioContextClass();
     const compressor = state.audioContext.createDynamicsCompressor();
+    state.pianoBus = state.audioContext.createGain();
     state.masterGain = state.audioContext.createGain();
-    state.masterGain.gain.value = state.volumeLevel;
+    state.masterGain.gain.value = getCurrentVolume();
     const bassBoost = state.audioContext.createBiquadFilter();
     bassBoost.type = "lowshelf";
     bassBoost.frequency.value = 220;
-    bassBoost.gain.value = 5;
-    compressor.threshold.value = -8;
-    compressor.knee.value = 4;
-    compressor.ratio.value = 12;
+    bassBoost.gain.value = 2;
+    compressor.threshold.value = -12;
+    compressor.knee.value = 12;
+    compressor.ratio.value = 3;
     compressor.attack.value = 0.003;
     compressor.release.value = 0.18;
-    state.masterGain.connect(bassBoost);
+    // Volume DEPOIS do compressor: a compressão não deve compensar o controle.
+    state.pianoBus.connect(bassBoost);
     bassBoost.connect(compressor);
-    compressor.connect(state.audioContext.destination);
+    compressor.connect(state.masterGain);
+    state.masterGain.connect(state.audioContext.destination);
   }
 
   if (state.audioContext.state === "suspended") {
@@ -787,6 +841,12 @@ function getAudioContext() {
   }
 
   return state.audioContext;
+}
+
+function getCurrentVolume() {
+  return ui.settingsModal.classList.contains("hidden")
+    ? state.volumeLevel
+    : Number(ui.volumeInput.value) / 100;
 }
 
 init();

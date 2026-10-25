@@ -50,7 +50,9 @@ O grupo “Leitura à primeira vista · iniciante” contém 12 exercícios auto
 
 ## Observações
 
-- O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. As configurações permitem escolher volume e entre três variações de timbre de piano; continuam sendo sínteses, não gravações sampleadas de um piano acústico.
+- O áudio é sintetizado pela Web Audio API, sem arquivos MIDI externos ou samples grandes. Há seis timbres: clássico, suave, brilhante, sustain longo, feltro e elétrico. Cada um tem harmônicos, decaimento e cauda próprios; continuam sendo sínteses, não gravações sampleadas de um piano acústico.
+- Em “Configurações”, “Testar som” toca um acorde com o volume e o timbre selecionados, sem precisar salvar. O volume vai de 0% (mudo) a 200% e pode ser ajustado durante o teste. O teste interrompe a reprodução do exercício; “Cancelar” restaura os ajustes salvos.
+- O tamanho das notas tem uma prévia imediata nas configurações e é aplicado à partitura ao salvar. A notação mantém sua escala real, com quebra de linhas e rolagem quando necessário, inclusive no celular e em tela cheia.
 - Há 57 exercícios: 30 em seis grupos de tonalidade (dó, sol, ré, fá, si bemol e mi bemol maiores), mais cinco de mãos alternadas, cinco de mãos simultâneas, cinco padrões clássicos de cinco dedos e 12 exercícios autorais de leitura à primeira vista.
 - O grupo “Clássicos · padrão de Hanon nº 1” traz uma adaptação curta do padrão de abertura associado ao primeiro exercício de *Le Pianiste Virtuose*, transposta para dó, sol, fá, ré e si bemol maior. As transposições e a organização para o jogo são adaptações pedagógicas, não uma reprodução integral da edição.
 - ABCJS renderiza as partituras em pauta dupla, com clave de sol e de fá, armadura, barras de compasso e durações musicais. Notas abaixo do dó central vão para a clave de fá.

@@ -108,7 +108,7 @@
         </label>
         <label class="setting-field" for="volumeInput">
           <span>Volume do piano <strong id="volumeValue">150%</strong></span>
-          <input id="volumeInput" type="range" min="50" max="200" step="5" value="150" />
+          <input id="volumeInput" type="range" min="0" max="200" step="5" value="150" />
         </label>
         <label class="setting-field" for="noteSizeInput">
           <span>Tamanho das notas <strong id="noteSizeValue">115%</strong></span>
@@ -120,8 +120,15 @@
             <option value="grand">Piano clássico</option>
             <option value="soft">Piano suave</option>
             <option value="bright">Piano brilhante</option>
+            <option value="sustained">Piano com sustain longo</option>
+            <option value="felt">Piano feltro — macio e encorpado</option>
+            <option value="electric">Piano elétrico — som de sino</option>
           </select>
         </label>
+        <button id="testSoundBtn" type="button" class="secondary-btn">♫ Testar som</button>
+        <p id="soundPreviewStatus" class="setting-help" role="status">Use “Testar som” para comparar o volume e o timbre antes de salvar.</p>
+        <span class="setting-preview-label">Prévia do tamanho das notas</span>
+        <div id="noteSizePreview" role="img" aria-label="Prévia da partitura com o tamanho de notas selecionado"></div>
         <div class="modal-actions">
           <button id="cancelSettingsBtn" type="button" class="secondary-btn">Cancelar</button>
           <button type="submit" class="primary-btn">Salvar</button>

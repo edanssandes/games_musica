@@ -214,7 +214,7 @@ input:focus-visible {
 
 #staff svg {
   display: block;
-  max-width: 100%;
+  max-width: none;
   height: auto;
   margin: 0 auto;
 }
@@ -422,6 +422,26 @@ input:focus-visible {
   color: var(--muted);
 }
 
+.setting-help,
+.setting-preview-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+#noteSizePreview {
+  min-width: 0;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  padding: 8px;
+}
+
+#noteSizePreview svg {
+  display: block;
+  max-width: none;
+}
+
 .number-input-wrap {
   display: flex;
   align-items: center;
@@ -505,9 +525,6 @@ input:focus-visible {
   }
 
   #staff svg {
-    width: auto;
-    min-width: 600px;
-    max-width: none;
     margin: 0 auto;
   }
 
@@ -562,9 +579,6 @@ input:focus-visible {
     font-size: 0.9rem;
   }
 
-  .app-shell:fullscreen #staff svg {
-    min-width: 680px;
-  }
 }
 
 body.focus-mode-active {
@@ -586,9 +600,6 @@ body.focus-mode-active {
     padding: 8px;
   }
 
-  .app-shell.focus-mode #staff svg {
-    min-width: 680px;
-  }
 }
 
 @media (max-width: 380px) {
@@ -601,17 +612,6 @@ body.focus-mode-active {
     padding: 14px 12px;
   }
 
-  #staff svg {
-    min-width: 600px;
-  }
-}
-
-@media (pointer: coarse) and (max-height: 500px) {
-  .app-shell:fullscreen #staff svg,
-  .app-shell.focus-mode #staff svg {
-    min-width: 680px;
-    max-width: none;
-  }
 }
 
 @media (max-width: 680px) and (orientation: portrait) {
