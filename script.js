@@ -634,11 +634,12 @@ function renderScore() {
   const baseScale = compactLayout ? (fullscreenLayout ? 1.8 : 1.65) : 1.45;
   const scale = baseScale * state.noteSizeLevel;
   window.ABCJS.renderAbc(ui.staff, abc, {
-    // Um SVG responsivo ajusta a largura e anula visualmente a escala.
-    // Manter as dimensões reais; a área da partitura oferece rolagem se necessário.
+    // Ajustar o tamanho das notas pela largura lógica, sem ampliar o SVG além da tela.
+    // Sem wrap, todos os compassos permanecem na mesma linha; o modo responsivo
+    // limita o tamanho solicitado quando a linha já ocupa toda a largura disponível.
+    responsive: "resize",
     staffwidth: Math.max(240, staffWidth / scale - 40),
-    wrap: { minSpacing: 1.8, maxSpacing: 2.7, preferredMeasuresPerLine: 4 },
-    scale,
+    scale: 1,
     paddingtop: 12,
     paddingbottom: 12,
     foregroundColor: "#111",
@@ -662,10 +663,8 @@ function exerciseToAbc(exercise) {
 
   const header = [
     `X:1`,
-    `T:${exercise.name}`,
     `M:4/4`,
     `L:1/4`,
-    `Q:1/4=${getPlaybackBpm(exercise)}`,
     `%%score { (treble) | (bass) }`,
     `V:treble clef=treble`,
     `V:bass clef=bass`,

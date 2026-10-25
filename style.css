@@ -77,6 +77,7 @@ h1 {
 
 .game-panel {
   display: grid;
+  min-width: 0;
   gap: 14px;
 }
 
@@ -176,6 +177,7 @@ input:focus-visible {
 }
 
 .sheet-card {
+  min-width: 0;
   padding: 22px 20px 16px;
 }
 
@@ -202,6 +204,7 @@ input:focus-visible {
 
 #staff {
   width: 100%;
+  min-width: 0;
   min-height: 320px;
   padding: 20px;
   border-radius: 12px;
@@ -214,7 +217,7 @@ input:focus-visible {
 
 #staff svg {
   display: block;
-  max-width: none;
+  max-width: 100%;
   height: auto;
   margin: 0 auto;
 }
