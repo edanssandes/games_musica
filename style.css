@@ -236,10 +236,9 @@ input:focus-visible {
 
 .app-shell:fullscreen .fullscreen-controls,
 .app-shell.focus-mode .fullscreen-controls {
-  position: fixed;
-  right: 50%;
-  bottom: max(14px, env(safe-area-inset-bottom));
-  z-index: 3;
+  order: 2;
+  flex: 0 0 auto;
+  align-self: center;
   display: flex;
   gap: 10px;
   padding: 8px;
@@ -247,7 +246,6 @@ input:focus-visible {
   border-radius: 16px;
   background: rgba(12, 18, 32, 0.88);
   box-shadow: 0 8px 24px var(--shadow);
-  transform: translateX(50%);
   backdrop-filter: blur(12px);
 }
 
@@ -260,6 +258,7 @@ input:focus-visible {
 .app-shell.focus-mode {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   max-width: none;
   margin: 0;
   padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
@@ -287,7 +286,7 @@ input:focus-visible {
 .app-shell:fullscreen .sheet-card,
 .app-shell.focus-mode .sheet-card {
   min-height: 0;
-  padding: 0 0 76px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -320,8 +319,10 @@ input:focus-visible {
 
 .app-shell:fullscreen #staff,
 .app-shell.focus-mode #staff {
-  flex: 1 1 auto;
+  order: 1;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: auto;
 }
 
 .countdown {
